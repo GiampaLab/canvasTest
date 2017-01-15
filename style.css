@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  background: white;
+  overflow: hidden;
+  min-height: 100%;
+  font-family: 'Ubuntu Mono', monospace;
+}
+
+canvas{
+  background-color: rgb(25,25,25);
+}
+
+canvas, canvas:active, canvas:focus {
+  cursor: crosshair;
+}
