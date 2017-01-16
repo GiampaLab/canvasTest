@@ -28,7 +28,7 @@ function loadImages(arr, callback) {
 function init(){
 	loadImages(['content/icons/bullbasaur.svg', 'content/icons/charmander.svg', 
 		'content/icons/eevee.svg', 'content/icons/jigglypuff.svg', 'content/icons/pidgey.svg', 
-		'content/icons/pikachu.svg', 'content/icons/snorlax.svg', 'content/icons/rattata.svg'], start);
+		'content/icons/pikachu-2.svg', 'content/icons/snorlax.svg', 'content/icons/rattata.svg'], start);
 }
 
 function start(){
@@ -37,20 +37,22 @@ function start(){
     board = new Board(canvas.clientWidth, canvas.clientHeight, 4);
 	board.draw();
     playerCurrentCard = new Card(board,images);
-    playerCurrentCard.setPos(board.rows);
-    //window.requestAnimationFrame(draw);	
-    canvas.addEventListener("click", draw, false);
+    playerCurrentCard.setPos(board.rows-2);
+    window.requestAnimationFrame(draw);	
+    canvas.addEventListener("click", function(){
+    	if(moveUp)
+        moveUp = playerCurrentCard.moveUp();    
+    else
+        moveUp = !playerCurrentCard.moveDown();
+    }, false);
 }
 
 function draw(){
 	//ctx.globalCompositeOperation = 'destination-over';
     ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); // clear canvas
     board.draw();
-    if(moveUp)
-        moveUp = playerCurrentCard.moveUp();    
-    else
-        moveUp = !playerCurrentCard.moveDown();
-	//window.requestAnimationFrame(draw);	
+    playerCurrentCard.draw();
+	window.requestAnimationFrame(draw);	
 };
 
 var Board = (function(){
@@ -131,29 +133,49 @@ var Card = (function(){
         this.symbols = symbols;
         this.images = [];        
     };
-    Card.prototype.draw = function(pos){
-        this.currentPos = pos;
+    Card.prototype.draw = function(){
         var i = 0;
-        for(var y= pos; y < pos + 2; y++){
+        for(var y= this.currentPos; y < this.currentPos + 2; y++){
             for(var x = 0; x < this.board.columns; x++){
                 var theHex = this.board.hexagons[x][y];
-                ctx.drawImage(this.symbols[i], theHex.pixelPos.x + theHex.radius/2, theHex.pixelPos.y + theHex.radius/2, theHex.radius, theHex.radius);
-                i++;
+                var posy = theHex.pixelPos.y;
+                if(this.direction && this.symbols[i].previousPos){
+                	if(this.direction == "up" && this.symbols[i].previousPos - 4 > theHex.pixelPos.y ){
+                		this.symbols[i].previousPos = this.symbols[i].previousPos - 4;
+                		posy = this.symbols[i].previousPos;
+                	}
+                	else if(this.symbols[i].previousPos + 4 < theHex.pixelPos.y ){
+                		this.symbols[i].previousPos = this.symbols[i].previousPos + 4;
+                		posy = this.symbols[i].previousPos;
+                	}
+                	else{
+                		posy = theHex.pixelPos.y;
+                	}
+                }
+        		innerDraw(this.symbols[i], theHex.pixelPos.x, posy, theHex.radius);
+        		if(posy == theHex.pixelPos.y)
+        			this.symbols[i].previousPos = theHex.pixelPos.y;
+            	i++;
             }
         }
     };
+    function innerDraw(symbol, x, y, radius, angle){
+    	ctx.drawImage(symbol, x + radius/2, y + radius*Math.sin(Math.PI/3)/2, radius, radius);
+    }
     Card.prototype.setPos = function(pos){
     	this.currentPos = pos;
     };
     Card.prototype.moveUp = function(){
         var i = 0;
-        this.draw(this.currentPos - 2);
+        this.direction = "up";
+        this.currentPos -= 2;
         if(this.currentPos - 2 < 0)
             return false;
         return true;
     };
     Card.prototype.moveDown = function(){
-        this.draw(this.currentPos + 2);
+    	this.currentPos += 2;
+        this.direction = "down";
         if(this.currentPos >= board.hexagons[0].length -2)
             return false;
         return true;
