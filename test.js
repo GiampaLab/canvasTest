@@ -5,6 +5,8 @@ var x = y = 0;
 var hex;
 var images = [];
 var moveUp = true;
+var playerCurrentCard;
+var extractedCard;
 
 function loadImages(arr, callback) {
     var loadedImageCount = 0;
@@ -28,16 +30,23 @@ function loadImages(arr, callback) {
 function init(){
 	loadImages(['content/icons/bullbasaur.svg', 'content/icons/charmander.svg', 
 		'content/icons/eevee.svg', 'content/icons/jigglypuff.svg', 'content/icons/pidgey.svg', 
-		'content/icons/pikachu-2.svg', 'content/icons/snorlax.svg', 'content/icons/rattata.svg'], start);
+		'content/icons/pikachu-2.svg', 'content/icons/snorlax.svg', 'content/icons/rattata.svg',
+        'content/icons/candy.svg', 'content/icons/caterpie.svg', 'content/icons/dratini.svg',
+        'content/icons/insignia.svg', 'content/icons/instinct.svg', 'content/icons/meowth.svg',
+        'content/icons/lucky-egg.svg', 'content/icons/mankey.svg'], start);
 }
 
 function start(){
 	canvas = document.getElementById('myContainer');
+    var boardCanvas = document.getElementById('boardContainer');
 	ctx = canvas.getContext('2d');
+    boardCtx = boardCanvas.getContext('2d');
     board = new Board(canvas.clientWidth, canvas.clientHeight, 4);
-	board.draw();
-    playerCurrentCard = new Card(board,images);
+	board.draw(boardCtx);
+    playerCurrentCard = new Card(board,images.slice(8,16));
+    extractedCard = new Card(board,images.slice(0,8));
     playerCurrentCard.setPos(board.rows-2);
+    extractedCard.setPos(0);
     window.requestAnimationFrame(draw);	
     canvas.addEventListener("click", function(){
 	if(moveUp)
@@ -50,8 +59,9 @@ function start(){
 function draw(){
 	//ctx.globalCompositeOperation = 'destination-over';
     ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); // clear canvas
-    board.draw();
+    //board.draw();
     playerCurrentCard.draw();
+    extractedCard.draw();
 	window.requestAnimationFrame(draw);	
 };
 
@@ -66,6 +76,9 @@ var Board = (function(){
         this.hexAngle = Math.PI / 3;
         this.hexRadius = this.width/(3 * this.columns + Math.cos(this.hexAngle));
         this.rows = Math.floor(((height - this.hexRadius * Math.sin(this.hexAngle))/ (this.hexRadius * Math.sin(this.hexAngle))));
+        //even number of rows
+        if(this.rows % 2 == 1)
+            this.rows -= 1;
         for (var x = 0; x < this.columns; x++) {
             this.hexagons.push([]);
             for (var y = 0; y < this.rows; y++) {
@@ -74,11 +87,11 @@ var Board = (function(){
             }
         }       
     };
-    Board.prototype.draw = function(){
+    Board.prototype.draw = function(ctx){
         for (var x = 0; x < this.columns; x++) {
             for (var y = 0; y < this.rows; y++) {
                 var hex = this.hexagons[x][y];
-                hex.draw();
+                hex.draw(ctx);
             }
         }
     }
