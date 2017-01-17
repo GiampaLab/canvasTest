@@ -40,7 +40,7 @@ function start(){
     playerCurrentCard.setPos(board.rows-2);
     window.requestAnimationFrame(draw);	
     canvas.addEventListener("click", function(){
-    	if(moveUp)
+	if(moveUp)
         moveUp = playerCurrentCard.moveUp();    
     else
         moveUp = !playerCurrentCard.moveDown();
@@ -85,39 +85,6 @@ var Board = (function(){
     return Board;
 }());
 
-var Hex = (function () {
-    function Hex(x, y, radius, margin) {
-        this.angle = Math.PI / 3;
-        this.margin = margin;
-        this.radius = radius;
-        this.width = this.radius * 2;
-        this.height = Math.sqrt(3) * this.radius;
-        // establish grid position
-        this.pos = new Vector(x, y);
-        // establish pixel position
-        this.pixelPos = new Vector(this.radius * 3 * x + y%2 * (this.radius + this.radius * Math.cos(this.angle)), this.height * y * 0.5);
-    };
-    Hex.prototype.draw = function () {
-        var brightness = 17;
-        var computedHexRadius = this.radius;
-        ctx.save();
-        ctx.translate(this.pixelPos.x, this.pixelPos.y);
-        ctx.fillStyle = "rgb(35,135,112)";
-        ctx.strokeStyle = "rgb(55,175,212)";
-        ctx.beginPath();
-        ctx.lineTo(this.radius * Math.cos(this.angle), 0);
-        ctx.lineTo(this.radius + this.radius * Math.cos(this.angle), 0);
-        ctx.lineTo(this.radius + 2 * this.radius * Math.cos(this.angle), Math.sin(this.angle) * this.radius);
-        ctx.lineTo(this.radius + this.radius * Math.cos(this.angle), 2 * Math.sin(this.angle) * this.radius);
-        ctx.lineTo(this.radius * Math.cos(this.angle), 2 * Math.sin(this.angle) * this.radius);
-        ctx.lineTo(0, Math.sin(this.angle) * this.radius);
-		ctx.closePath();
-		ctx.fill();
-		ctx.stroke();
-		ctx.restore();
-    };
-    return Hex;
-}());
 
 var Vector = (function(){
 	function Vector(x, y){
@@ -125,60 +92,4 @@ var Vector = (function(){
 		this.y = y;
 	};
 	return Vector;
-}());
-
-var Card = (function(){
-    function Card(board, symbols){
-        this.board = board;
-        this.symbols = symbols;
-        this.images = [];        
-    };
-    Card.prototype.draw = function(){
-        var i = 0;
-        for(var y= this.currentPos; y < this.currentPos + 2; y++){
-            for(var x = 0; x < this.board.columns; x++){
-                var theHex = this.board.hexagons[x][y];
-                var posy = theHex.pixelPos.y;
-                if(this.direction && this.symbols[i].previousPos){
-                	if(this.direction == "up" && this.symbols[i].previousPos - 4 > theHex.pixelPos.y ){
-                		this.symbols[i].previousPos = this.symbols[i].previousPos - 4;
-                		posy = this.symbols[i].previousPos;
-                	}
-                	else if(this.symbols[i].previousPos + 4 < theHex.pixelPos.y ){
-                		this.symbols[i].previousPos = this.symbols[i].previousPos + 4;
-                		posy = this.symbols[i].previousPos;
-                	}
-                	else{
-                		posy = theHex.pixelPos.y;
-                	}
-                }
-        		innerDraw(this.symbols[i], theHex.pixelPos.x, posy, theHex.radius);
-        		if(posy == theHex.pixelPos.y)
-        			this.symbols[i].previousPos = theHex.pixelPos.y;
-            	i++;
-            }
-        }
-    };
-    function innerDraw(symbol, x, y, radius, angle){
-    	ctx.drawImage(symbol, x + radius/2, y + radius*Math.sin(Math.PI/3)/2, radius, radius);
-    }
-    Card.prototype.setPos = function(pos){
-    	this.currentPos = pos;
-    };
-    Card.prototype.moveUp = function(){
-        var i = 0;
-        this.direction = "up";
-        this.currentPos -= 2;
-        if(this.currentPos - 2 < 0)
-            return false;
-        return true;
-    };
-    Card.prototype.moveDown = function(){
-    	this.currentPos += 2;
-        this.direction = "down";
-        if(this.currentPos >= board.hexagons[0].length -2)
-            return false;
-        return true;
-    };
-    return Card;
 }());

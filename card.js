@@ -11,28 +11,33 @@ var Card = (function(){
         for(var y= this.currentPos; y < this.currentPos + 2; y++){
             for(var x = 0; x < this.board.columns; x++){
                 var theHex = this.board.hexagons[x][y];
-                var posy = theHex.pixelPos.y;
+                var nextPosY = theHex.pixelPos.y;
                 if(this.animation){
-                	if(this.animation == "up" && this.symbols[i].previousPos - 4 > theHex.pixelPos.y ){
-                		this.symbols[i].previousPos = this.symbols[i].previousPos - 4;
-                		posy = this.symbols[i].previousPos;
-                	}
-                	else if(this.symbols[i].previousPos + 4 < theHex.pixelPos.y ){
-                		this.symbols[i].previousPos = this.symbols[i].previousPos + 4;
-                		posy = this.symbols[i].previousPos;
-                	}
-                	else{
-                		posy = theHex.pixelPos.y;
-                        this.animation = null;
-                	}
+                	nextPosY = this.getNextPosY(theHex.pixelPos.y, this.symbols[i]);
                 }
                 if(!this.animation)
-                    this.symbols[i].previousPos = theHex.pixelPos.y;
-        		innerDraw(this.symbols[i], theHex.pixelPos.x, posy, theHex.radius);
+                    this.symbols[i].currentPosY = theHex.pixelPos.y;
+        		innerDraw(this.symbols[i], theHex.pixelPos.x, nextPosY, theHex.radius);
             	i++;
             }
         }
     };
+    Card.prototype.getNextPosY = function(targetPosY, symbol){
+        var nextPos;
+        if(this.animation == "up" && symbol.currentPosY - 4 > targetPosY ){
+            symbol.currentPosY = symbol.currentPosY - 4;
+            nextPos = symbol.currentPosY;
+        }
+        else if(symbol.currentPosY + 4 < targetPosY ){
+            symbol.currentPosY = symbol.currentPosY + 4;
+            nextPos = symbol.currentPosY;
+        }
+        else{
+            symbol.currentPosY = nextPos = targetPosY;
+            this.animation = null;
+        }
+        return nextPos;
+    }
     function innerDraw(symbol, x, y, radius, angle){
     	ctx.drawImage(symbol, x + radius/2, y + radius*Math.sin(Math.PI/3)/2, radius, radius);
     }
