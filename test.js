@@ -7,6 +7,7 @@ var images = [];
 var moveUp = true;
 var playerCurrentCard;
 var extractedCard;
+var state;
 
 function loadImages(arr, callback) {
     var loadedImageCount = 0;
@@ -47,16 +48,26 @@ function start(){
     extractedCard = new Card(board,images.slice(0,8));
     playerCurrentCard.setPos(board.rows-2);
     extractedCard.setPos(0);
-    window.requestAnimationFrame(draw);	
+    playerCurrentCard.draw();
+    extractedCard.draw();
+    
     canvas.addEventListener("click", function(){
-	if(moveUp)
-        moveUp = playerCurrentCard.moveUp();    
-    else
-        moveUp = !playerCurrentCard.moveDown();
+    	if(moveUp)
+            moveUp = playerCurrentCard.moveUp(onFininsh);    
+        else
+            moveUp = !playerCurrentCard.moveDown(onFininsh);
+        state = "move";
+        window.requestAnimationFrame(draw); 
     }, false);
 }
 
+function onFininsh(){
+    state = "init";
+}
+
 function draw(){
+    if(state != "move")
+        return;
 	//ctx.globalCompositeOperation = 'destination-over';
     ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); // clear canvas
     //board.draw();

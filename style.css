@@ -9,11 +9,8 @@ body {
 canvas{
 	position: absolute;
 	left: 0;
-    
-}
-
-.board{
-	background-color: rgb(25,25,25);
+	height: 750;
+	width: 600;
 }
 
 canvas, canvas:active, canvas:focus {

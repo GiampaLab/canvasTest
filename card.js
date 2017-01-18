@@ -6,7 +6,7 @@ var Card = (function(){
         this.animation;    
         this.animationActive = false;
     };
-    Card.prototype.draw = function(){
+    Card.prototype.draw = function(pos){
         var i = 0;
         for(var y= this.currentPos; y < this.currentPos + 2; y++){
             for(var x = 0; x < this.board.columns; x++){
@@ -35,6 +35,7 @@ var Card = (function(){
         else{
             symbol.currentPosY = nextPos = targetPosY;
             this.animation = null;
+            this.callback();
         }
         return nextPos;
     }
@@ -44,9 +45,10 @@ var Card = (function(){
     Card.prototype.setPos = function(pos){
     	this.currentPos = pos;
     };
-    Card.prototype.moveUp = function(){
+    Card.prototype.moveUp = function(callback){
         if(this.animation)
             return true;
+        this.callback = callback;
         var i = 0;
         this.animation = "up";
         this.currentPos -= 2;
@@ -54,9 +56,10 @@ var Card = (function(){
             return false;
         return true;
     };
-    Card.prototype.moveDown = function(){
+    Card.prototype.moveDown = function(callback){
         if(this.animation)
             return true;
+        this.callback = callback;
     	this.currentPos += 2;
         this.animation = "down";
         if(this.currentPos >= board.hexagons[0].length -2)
