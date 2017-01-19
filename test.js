@@ -42,8 +42,8 @@ function start(){
     var boardCanvas = document.getElementById('boardContainer');
 	ctx = canvas.getContext('2d');
     boardCtx = boardCanvas.getContext('2d');
-    board = new Board(canvas.clientWidth, canvas.clientHeight, 4);
-	board.draw(boardCtx);
+    board = new Board(boardCtx, canvas.clientWidth, canvas.clientHeight, 4);
+	board.draw();
     playerCurrentCard = new Card(board,images.slice(8,16));
     extractedCard = new Card(board,images.slice(0,8));
     playerCurrentCard.setPos(board.rows-2);
@@ -59,61 +59,36 @@ function start(){
         state = "move";
         window.requestAnimationFrame(draw); 
     }, false);
+    canvas.addEventListener("mousemove", function(evt) { 
+        state = "mousemove";
+        var mousePos = getMousePos(canvas, evt);
+        board.mouseOver(mousePos, onFininsh);
+        window.requestAnimationFrame(draw); 
+    });
+}
+
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return new Vector(evt.clientX - rect.left, evt.clientY - rect.top);
 }
 
 function onFininsh(){
-    state = "init";
+    state = null;
 }
 
 function draw(){
-    if(state != "move")
+    if(!state)
         return;
-	//ctx.globalCompositeOperation = 'destination-over';
-    ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); // clear canvas
-    //board.draw();
-    playerCurrentCard.draw();
-    extractedCard.draw();
-	window.requestAnimationFrame(draw);	
-};
-
-var Board = (function(){
-    function Board(width, height, columns){
-        this.width = width;
-        this.height = height;
-        this.columns = columns;
-        this.hexRadius; // from center to one of the points
-        this.hexMargin = 2; // space around hexagons
-        this.hexagons = [];
-        this.hexAngle = Math.PI / 3;
-        this.hexRadius = this.width/(3 * this.columns + Math.cos(this.hexAngle));
-        this.rows = Math.floor(((height - this.hexRadius * Math.sin(this.hexAngle))/ (this.hexRadius * Math.sin(this.hexAngle))));
-        //even number of rows
-        if(this.rows % 2 == 1)
-            this.rows -= 1;
-        for (var x = 0; x < this.columns; x++) {
-            this.hexagons.push([]);
-            for (var y = 0; y < this.rows; y++) {
-                var hex = new Hex(x, y, this.hexRadius, this.hexMargin);
-                this.hexagons[x].push(hex);
-            }
-        }       
-    };
-    Board.prototype.draw = function(ctx){
-        for (var x = 0; x < this.columns; x++) {
-            for (var y = 0; y < this.rows; y++) {
-                var hex = this.hexagons[x][y];
-                hex.draw(ctx);
-            }
-        }
+    if(state == "move"){
+    	//ctx.globalCompositeOperation = 'destination-over';
+        ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); // clear canvas
+        //board.draw();
+        playerCurrentCard.draw();
+        extractedCard.draw();
+    	window.requestAnimationFrame(draw);	
     }
-    return Board;
-}());
-
-
-var Vector = (function(){
-	function Vector(x, y){
-		this.x = x;
-		this.y = y;
-	};
-	return Vector;
-}());
+    if(state == "mousemove"){
+        board.draw();
+        window.requestAnimationFrame(draw); 
+    }
+};
