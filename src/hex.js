@@ -52,7 +52,7 @@ var Hex = (function () {
             that = this;
         that.context.save();
         if(!fillStyle)
-            that.context.fillStyle = "rgb(35,135,112)";
+            that.context.fillStyle = "rgb(35,125,112)";
         else
             that.context.fillStyle = fillStyle;
         that.context.translate(that.pixelPos.x, that.pixelPos.y);
@@ -97,23 +97,28 @@ var Hex = (function () {
             var ctx = this.context;
             var draw = this.draw;
             var self = this;
-            this.animId = this.animator.animate(500, 11,
+            this.animId = this.animator.animate(1000, 10,
                 function(alpha, progress, duration){
                     var fillStyle = "rgb(" + Math.round(self.r * alpha) +", " + Math.round(self.g* alpha) +","+ Math.round(self.b* alpha) +")";
                     self.context.clearRect(self.hexCenter.x - self.radius, self.hexCenter.y - self. hexCenter, self.radius * 2, self.height * 2);
                     self.draw(self, fillStyle);
+                        if(self.stopAnimation){
+                            if(self.r * alpha === self.r){
+                            console.log(fillStyle, self.r, self.g, self.b);
+                            self.animator.cancelAnimation(self.animId);
+                            self.animId = null;
+                            self.stopAnimation = false;
+                        }
+                    }
                     return true;
                 }
-                , true, true
+                , true, false
             );
-            console.log("Starts on: ", this.animId,this.x, this.y);
         }
     }
     Hex.prototype.mouseExit = function(callback){
        if(typeof(this.animId) !== "undefined" && this.animId !== null){
-            console.log("Ends on: ", this.animId, this.x, this.y);
-            this.animator.cancelAnimation(this.animId);
-            this.animId = null;
+            this.stopAnimation = true;
        }
     }
     return Hex;
