@@ -1,0 +1,70 @@
+<style type="text/css">div { display: inline-block; padding: 0.5em; border: 1px solid black; margin: 0.5em; }</style>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Linear
+</div><br />
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in cubic
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in quartic
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in sine
+</div><br />
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease out
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease out cubic
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease out quartic
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease out sine
+</div><br />
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in/out
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in/out cubic
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in/out quartic
+</div>
+<div>
+  <canvas width="70" height="300"></canvas><br />
+  Ease in/out sine
+</div>
+<script type="text/javascript" src="Animator.js"></script>
+<script type="text/javascript">
+  var animator = new Animator();
+  var canvases = document.getElementsByTagName("canvas");
+  for (var i = 0; i < canvases.length; i++) {
+    (function() {var ctx = canvases[i].getContext("2d");
+    animator.animate(1000, i,
+      function(alpha, progress, duration) {
+        ctx.clearRect(0, 0, 100, 500);
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(35, (265 * alpha) + (35 * (1 - alpha)), 35, 0, Math.PI*2, true);
+        ctx.fill();
+        return true;
+      }, true, true);})();
+  }
+</script>

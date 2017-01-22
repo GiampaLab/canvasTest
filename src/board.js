@@ -1,6 +1,5 @@
 var Board = (function(){
     function Board(context, width, height, columns, animator){
-        this.animator = animator;
         this.context = context;
         this.width = width;
         this.height = height;
@@ -9,7 +8,7 @@ var Board = (function(){
         this.hexMargin = 2; // space around hexagons
         this.hexagons = [];
         this.hexAngle = Math.PI / 3;
-        this.hexRadius = Math.round(this.width/(3 * this.columns + Math.cos(this.hexAngle)));
+        this.hexRadius = this.width/(3 * this.columns + Math.cos(this.hexAngle));
         this.rows = Math.floor(((height - this.hexRadius * Math.sin(this.hexAngle))/ (this.hexRadius * Math.sin(this.hexAngle))));
         //even number of rows
         if(this.rows % 2 == 1)

@@ -1,4 +1,5 @@
 var canvas;
+var boardCanvas;
 var ctx;
 var img;
 var x = y = 0;
@@ -8,6 +9,7 @@ var moveUp = true;
 var playerCurrentCard;
 var extractedCard;
 var state;
+var animator;
 
 function loadImages(arr, callback) {
     var loadedImageCount = 0;
@@ -36,20 +38,24 @@ function init(){
         'content/icons/insignia.svg', 'content/icons/instinct.svg', 'content/icons/meowth.svg',
         'content/icons/lucky-egg.svg', 'content/icons/mankey.svg'], start);
 }
-
+    
 function start(){
+    animator = new Animator();
 	canvas = document.getElementById('myContainer');
-    var boardCanvas = document.getElementById('boardContainer');
+    boardCanvas = document.getElementById('boardContainer');
+    setCanvasWidthAndHeight(canvas);
+    setCanvasWidthAndHeight(boardCanvas);
 	ctx = canvas.getContext('2d');
     boardCtx = boardCanvas.getContext('2d');
-    board = new Board(boardCtx, canvas.clientWidth, canvas.clientHeight, 4);
+    board = new Board(boardCtx, canvas.clientWidth, canvas.clientHeight, 4, animator);
 	board.draw();
     playerCurrentCard = new Card(board,images.slice(8,16));
     extractedCard = new Card(board,images.slice(0,8));
     playerCurrentCard.setPos(board.rows-2);
     extractedCard.setPos(0);
-    playerCurrentCard.draw();
-    extractedCard.draw();
+    
+    //playerCurrentCard.draw();
+    //extractedCard.draw();
     
     canvas.addEventListener("click", function(){
     	if(moveUp)
@@ -59,11 +65,11 @@ function start(){
         state = "move";
         window.requestAnimationFrame(draw); 
     }, false);
-    canvas.addEventListener("mousemove", function(evt) { 
+    boardCanvas.addEventListener("mousemove", function(evt) { 
         state = "mousemove";
-        var mousePos = getMousePos(canvas, evt);
+        //window.requestAnimationFrame(draw); 
+        var mousePos = getMousePos(boardCanvas, evt);
         board.mouseOver(mousePos, onFininsh);
-        window.requestAnimationFrame(draw); 
     });
 }
 
@@ -85,10 +91,28 @@ function draw(){
         //board.draw();
         playerCurrentCard.draw();
         extractedCard.draw();
-    	window.requestAnimationFrame(draw);	
+    	//window.requestAnimationFrame(draw);	
     }
     if(state == "mousemove"){
         board.draw();
-        window.requestAnimationFrame(draw); 
+        //window.requestAnimationFrame(draw); 
     }
 };
+
+function setCanvasWidthAndHeight(canvas){
+    var style = window.getComputedStyle(canvas);
+    var widthPx = style.getPropertyValue("width");
+    var width = widthPx.substring(0, widthPx.indexOf("px"));
+    var heightPx = style.getPropertyValue("height");
+    var height = heightPx.substring(0, heightPx.indexOf("px"));
+    canvas.width = parseInt(width);
+    canvas.height = parseInt(height);
+}
+
+var Vector = (function(){
+    function Vector(x, y){
+        this.x = x;
+        this.y = y;
+    };
+    return Vector;
+}());

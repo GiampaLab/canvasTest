@@ -1,0 +1,9 @@
+<div style="width: 100px; height: 100px; border-radius: 50px; background-color: red; top: 0px; position: absolute"></div>
+<script type="text/javascript" src="Animator.js"></script>
+<script type="text/javascript">
+  var div = document.getElementsByTagName("div")[0];
+  var animator = new Animator();
+  // Please don't do this if possible, use CSS animation!
+  animator.animate(1000, animator.EASE_OUT_SINE,
+                   animator.propertyAnimator(div.style, "top", 400), true, true);
+</script>
