@@ -36,7 +36,7 @@ var Hex = (function () {
         else{
             that.context.strokeStyle = fillStyle;
         }
-        //that.context.clearRect(that.hexCenter.x - that.radius, that.hexCenter.y - that.height, that.radius, that.height * 2);
+        that.context.clearRect(that.hexCenter.x - that.radius, that.hexCenter.y - that.height, that.radius * 2, that.height * 2);
         that.context.translate(that.pixelPos.x, that.pixelPos.y);
         that.context.beginPath();
         // if(typeof(progress) !== "undefined" && progress !== null){
