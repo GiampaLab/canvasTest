@@ -5,7 +5,7 @@ var Board = (function(){
         this.height = height;
         this.columns = columns;
         this.hexRadius; // from center to one of the points
-        this.hexMargin = 2; // space around hexagons
+        this.hexMargin = 4; // space around hexagons
         this.hexagons = [];
         this.hexAngle = Math.PI / 3;
         this.hexRadius = this.width/(3 * this.columns + Math.cos(this.hexAngle));
@@ -35,7 +35,7 @@ var Board = (function(){
             for (var y = 0; y < this.rows; y++) {
                 if(this.hexagons[x][y].isPointInPath(mousePos)){
                     var hex = this.hexagons[x][y];
-                    hex.mouseOver(callback);
+                    hex.mouseOver(callback, mousePos);
                 }
                 else{
                     this.hexagons[x][y].mouseExit(callback);
