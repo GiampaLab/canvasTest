@@ -26,19 +26,32 @@ var Hex = (function () {
             that = self;
         else
             that = this;
-        //figure out hoe to clear a shape
-        //that.context.clearRect(that.hexCenter.x - that.radius, that.hexCenter.y - that.height, that.radius * 2, that.height * 2);
         that.context.save();
         if(!fillStyle){
             that.context.strokeStyle = "rgb(" + that.r +", " + that.g +","+ that.b +")";
         }
         else{
             that.context.strokeStyle = fillStyle;
-            
         }
         that.context.translate(that.hexCenter.x, that.hexCenter.y);
-        // if(fillStyle)
-        //     that.context.rotate(Math.PI * alpha);
+        
+        that.context.save();
+        that.context.globalCompositeOperation = "destination-out";
+        if(typeof(that.prevAlpha) !== "undefined" && that.prevAlpha !== null){
+           that.context.rotate(Math.PI/3 * Math.round(that.prevAlpha * 100) / 100); 
+        }
+        drawHex(that);
+        that.context.stroke();
+        that.context.restore();
+        if(typeof(alpha) !== "undefined" && alpha !== null){
+           that.context.rotate(Math.PI/3 * Math.round(alpha * 100) / 100);
+           that.prevAlpha = alpha;
+        }
+        drawHex(this);
+        that.context.stroke();
+        that.context.restore();
+    };
+    function drawHex(that){
         that.context.beginPath();
         that.context.moveTo(-that.radius, 0);
         that.context.lineTo(-that.radius + that.cosRadius, -that.height);
@@ -51,8 +64,6 @@ var Hex = (function () {
         that.context.lineTo(that.cosRadius,  -that.height);
         that.context.moveTo(0, 0);
         that.context.lineTo(that.cosRadius, that.height);
-        that.context.stroke();
-        that.context.restore();
     };
     Hex.prototype.isPointInPath = function(pos){
         var q2x = Math.abs(pos.x - this.hexCenter.x);
@@ -76,7 +87,6 @@ var Hex = (function () {
         
         return s > 0 && t > 0 && (s + t) < 2 * A * sign;
     }
-
     Hex.prototype.mouseOver = function(callback, mousePos){
         this.mousePos = mousePos;
         if(typeof(this.animId) === "undefined" || this.animId === null){
