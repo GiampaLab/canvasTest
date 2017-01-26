@@ -29,14 +29,16 @@ var Hex = (function () {
             that = self;
         else
             that = this;
+        //figure out hoe to clear a shape
+        //that.context.clearRect(that.hexCenter.x - that.radius, that.hexCenter.y - that.height, that.radius * 2, that.height * 2);
+        
         that.context.save();
         if(!fillStyle){
-            that.context.strokeStyle = "rgb(35,125,112)";
+            that.context.strokeStyle = "rgb(" + that.r +", " + that.g +","+ that.b +")";
         }
         else{
             that.context.strokeStyle = fillStyle;
         }
-        that.context.clearRect(that.hexCenter.x - that.radius, that.hexCenter.y - that.height, that.radius * 2, that.height * 2);
         that.context.translate(that.pixelPos.x, that.pixelPos.y);
         that.context.beginPath();
         // if(typeof(progress) !== "undefined" && progress !== null){
@@ -67,14 +69,19 @@ var Hex = (function () {
         //     }
         // }
         // else{
-            that.context.lineTo(that.cosRadiusWitoutMargin, 0);
-            that.context.lineTo(that.radiusWitoutMargin + that.cosRadiusWitoutMargin,  0);
-            that.context.lineTo(that.radiusWitoutMargin + 2 * that.cosRadiusWitoutMargin, that.heightWitoutMargin);
-            that.context.lineTo(that.radiusWitoutMargin + that.cosRadiusWitoutMargin, 2 * that.heightWitoutMargin);
-            that.context.lineTo(that.cosRadiusWitoutMargin, 2 * that.heightWitoutMargin);
-            that.context.lineTo(0, that.heightWitoutMargin);
+            that.context.moveTo(0, that.height);
+            that.context.lineTo(that.cosRadius, 0);
+            that.context.lineTo(that.radius + that.cosRadius,  0);
+            that.context.lineTo(that.radius + 2 * that.cosRadius, that.height);
+            that.context.lineTo(that.radius + that.cosRadius, 2 * that.height);
+            that.context.lineTo(that.cosRadius, 2 * that.height);
+            that.context.lineTo(0, that.height);
+            that.context.lineTo(that.radius, that.height);
+            that.context.lineTo(that.radius + that.cosRadius,  0);
+            that.context.moveTo(that.radius, that.height);
+            that.context.lineTo(that.radius + that.cosRadius, 2 * that.height);
         // }
-        that.context.closePath();
+        //that.context.closePath();
         that.context.stroke();
         that.context.restore();
     };
@@ -112,7 +119,6 @@ var Hex = (function () {
                 function(alpha, progress, duration){
                     var value = alpha + 0.4 * (1- alpha);
                     var fillStyle = "rgb(" + Math.round(self.r * value) +", " + Math.round(self.g* value) +","+ Math.round(self.b* value) +")";
-                    self.context.clearRect(self.hexCenter.x - self.radius, self.hexCenter.y - self. hexCenter, self.radius * 2, self.height * 2);
                     self.draw(self, fillStyle, progress);
                     if(self.stopAnimation){
                         if(self.r * value === self.r){
