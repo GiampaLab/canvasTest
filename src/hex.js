@@ -6,12 +6,9 @@ var Hex = (function () {
         this.angle = Math.PI / 3;
         this.margin = margin;
         this.radius = radius;
-        this.radiusWitoutMargin = radius;
         this.width = this.radius * 2;
-        this.height = Math.round(Math.sqrt(3) * this.radiusWitoutMargin)/2;
-        this.heightWitoutMargin = Math.round(Math.sqrt(3) * this.radius)/2;
+        this.height = Math.round(Math.sqrt(3) * this.radius)/2;
         this.cosRadius = Math.round(Math.cos(this.angle) * this.radius);
-        this.cosRadiusWitoutMargin = Math.round(Math.cos(this.angle) * this.radiusWitoutMargin);
         // establish grid position
         this.pos = new Vector(x, y);
         // establish pixel position
@@ -23,7 +20,7 @@ var Hex = (function () {
         this.animator = animator;
         this.state = "ready";
     };
-    Hex.prototype.draw = function (self, fillStyle, progress) {
+    Hex.prototype.draw = function (self, fillStyle, progress, alpha) {
         var that;
         if(self)
             that = self;
@@ -31,57 +28,29 @@ var Hex = (function () {
             that = this;
         //figure out hoe to clear a shape
         //that.context.clearRect(that.hexCenter.x - that.radius, that.hexCenter.y - that.height, that.radius * 2, that.height * 2);
-        
         that.context.save();
         if(!fillStyle){
             that.context.strokeStyle = "rgb(" + that.r +", " + that.g +","+ that.b +")";
         }
         else{
             that.context.strokeStyle = fillStyle;
+            
         }
-        that.context.translate(that.pixelPos.x, that.pixelPos.y);
+        that.context.translate(that.hexCenter.x, that.hexCenter.y);
+        // if(fillStyle)
+        //     that.context.rotate(Math.PI * alpha);
         that.context.beginPath();
-        // if(typeof(progress) !== "undefined" && progress !== null){
-        //     var line = Math.round(progress * 6 % 6);
-        //     if(line === 0){
-        //         that.context.moveTo(that.cosRadiusWitoutMargin, 0);
-        //         that.context.lineTo(that.radiusWitoutMargin + that.cosRadiusWitoutMargin,  0);
-        //     }
-        //     if(line === 1){
-        //         that.context.moveTo(that.radiusWitoutMargin + that.cosRadiusWitoutMargin,  0);
-        //         that.context.lineTo(that.radiusWitoutMargin + 2 * that.cosRadiusWitoutMargin, that.heightWitoutMargin);
-        //     }
-        //     if(line === 2){
-        //         that.context.moveTo(that.radiusWitoutMargin + 2 * that.cosRadiusWitoutMargin, that.heightWitoutMargin);
-        //         that.context.lineTo(that.radiusWitoutMargin + that.cosRadiusWitoutMargin, 2 * that.heightWitoutMargin);
-        //     }
-        //     if(line === 3){
-        //         that.context.moveTo(that.radiusWitoutMargin + that.cosRadiusWitoutMargin, 2 * that.heightWitoutMargin);
-        //         that.context.lineTo(that.cosRadiusWitoutMargin, 2 * that.heightWitoutMargin);
-        //     }
-        //     if(line === 4){
-        //         that.context.moveTo(that.cosRadiusWitoutMargin, 2 * that.heightWitoutMargin);
-        //         that.context.lineTo(0, that.heightWitoutMargin);
-        //     }
-        //     if(line === 5){
-        //         that.context.moveTo(0, that.heightWitoutMargin);
-        //         that.context.lineTo(that.cosRadiusWitoutMargin, 0);
-        //     }
-        // }
-        // else{
-            that.context.moveTo(0, that.height);
-            that.context.lineTo(that.cosRadius, 0);
-            that.context.lineTo(that.radius + that.cosRadius,  0);
-            that.context.lineTo(that.radius + 2 * that.cosRadius, that.height);
-            that.context.lineTo(that.radius + that.cosRadius, 2 * that.height);
-            that.context.lineTo(that.cosRadius, 2 * that.height);
-            that.context.lineTo(0, that.height);
-            that.context.lineTo(that.radius, that.height);
-            that.context.lineTo(that.radius + that.cosRadius,  0);
-            that.context.moveTo(that.radius, that.height);
-            that.context.lineTo(that.radius + that.cosRadius, 2 * that.height);
-        // }
-        //that.context.closePath();
+        that.context.moveTo(-that.radius, 0);
+        that.context.lineTo(-that.radius + that.cosRadius, -that.height);
+        that.context.lineTo(that.cosRadius,  -that.height);
+        that.context.lineTo(2 * that.cosRadius, 0);
+        that.context.lineTo(that.cosRadius, that.height);
+        that.context.lineTo(-that.radius + that.cosRadius, that.height);
+        that.context.lineTo(-that.radius, 0);
+        that.context.lineTo(0, 0);
+        that.context.lineTo(that.cosRadius,  -that.height);
+        that.context.moveTo(0, 0);
+        that.context.lineTo(that.cosRadius, that.height);
         that.context.stroke();
         that.context.restore();
     };
@@ -119,7 +88,7 @@ var Hex = (function () {
                 function(alpha, progress, duration){
                     var value = alpha + 0.4 * (1- alpha);
                     var fillStyle = "rgb(" + Math.round(self.r * value) +", " + Math.round(self.g* value) +","+ Math.round(self.b* value) +")";
-                    self.draw(self, fillStyle, progress);
+                    self.draw(self, fillStyle, progress, alpha);
                     if(self.stopAnimation){
                         if(self.r * value === self.r){
                             self.animator.cancelAnimation(self.animId);
