@@ -33,9 +33,9 @@ var Board = (function(){
         var hex;
         for (var x = 0; x < this.columns; x++) {
             for (var y = 0; y < this.rows; y++) {
-                if(this.hexagons[x][y].isPointInPath(mousePos)){
-                    var hex = this.hexagons[x][y];
-                    hex.mouseOver(callback, mousePos);
+                if(this.hexagons[x][y].isPointInPath(mousePos) && this.hexagons[x][y] !== this.hexActive){
+                    this.hexActive = this.hexagons[x][y];
+                    this.hexActive.mouseOver(callback, mousePos);
                 }
                 else{
                     this.hexagons[x][y].mouseExit(callback);

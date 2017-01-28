@@ -19,6 +19,7 @@ var Hex = (function () {
         this.b = 112;
         this.animator = animator;
         this.state = "ready";
+        this.rotationCount = 0;
     };
     Hex.prototype.draw = function (self, fillStyle, progress, alpha) {
         var that;
@@ -34,19 +35,21 @@ var Hex = (function () {
             that.context.strokeStyle = fillStyle;
         }
         that.context.translate(that.hexCenter.x, that.hexCenter.y);
-        
-        that.context.save();
-        that.context.globalCompositeOperation = "destination-out";
+
         if(typeof(that.prevAlpha) !== "undefined" && that.prevAlpha !== null){
-           that.context.rotate(Math.PI/3 * Math.round(that.prevAlpha * 100) / 100); 
+            that.context.save();
+            that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(that.prevAlpha * 100) / 100); 
+            deleteHex(that);
+            that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
+            deleteHex(that);
+            that.context.restore();
         }
-        drawHex(that);
-        that.context.stroke();
-        that.context.restore();
+        
         if(typeof(alpha) !== "undefined" && alpha !== null){
-           that.context.rotate(Math.PI/3 * Math.round(alpha * 100) / 100);
+           that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
            that.prevAlpha = alpha;
         }
+
         drawHex(this);
         that.context.stroke();
         that.context.restore();
@@ -64,6 +67,19 @@ var Hex = (function () {
         that.context.lineTo(that.cosRadius,  -that.height);
         that.context.moveTo(0, 0);
         that.context.lineTo(that.cosRadius, that.height);
+    };
+    function deleteHex(that){
+        that.context.globalCompositeOperation = "destination-out";
+        that.context.beginPath();
+        that.context.moveTo(-that.radius, 0);
+        that.context.lineTo(-that.radius + that.cosRadius, -that.height);
+        that.context.lineTo(that.cosRadius,  -that.height);
+        that.context.lineTo(2 * that.cosRadius, 0);
+        that.context.lineTo(that.cosRadius, that.height);
+        that.context.lineTo(-that.radius + that.cosRadius, that.height);
+        that.context.lineTo(-that.radius, 0);
+        that.context.fill();
+        that.context.closePath();
     };
     Hex.prototype.isPointInPath = function(pos){
         var q2x = Math.abs(pos.x - this.hexCenter.x);
@@ -94,18 +110,19 @@ var Hex = (function () {
             var ctx = this.context;
             var draw = this.draw;
             var self = this;
-            this.animId = this.animator.animate(1000, 10,
+            this.animId = this.animator.animate(1000, 9,
                 function(alpha, progress, duration){
                     var value = alpha + 0.4 * (1- alpha);
                     var fillStyle = "rgb(" + Math.round(self.r * value) +", " + Math.round(self.g* value) +","+ Math.round(self.b* value) +")";
                     self.draw(self, fillStyle, progress, alpha);
-                    if(self.stopAnimation){
+                    //if(self.stopAnimation){
                         if(self.r * value === self.r){
                             self.animator.cancelAnimation(self.animId);
                             self.animId = null;
                             self.stopAnimation = false;
+                            self.rotationCount++;
                         }
-                    }
+                   // }
                     return true;
                 }
                 , true, false
