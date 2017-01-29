@@ -20,6 +20,7 @@ var Hex = (function () {
         this.animator = animator;
         this.state = "ready";
         this.rotationCount = 0;
+        this.alphas = [];
     };
     Hex.prototype.draw = function (self, fillStyle, progress, alpha) {
         var that;
@@ -28,30 +29,34 @@ var Hex = (function () {
         else
             that = this;
         that.context.save();
+        that.context.translate(that.hexCenter.x, that.hexCenter.y);
+
+        if(typeof(that.alphas) !== "undefined" && that.alphas !== null && that.alphas.length > 0){
+            that.context.save();
+            for (i=0; i<that.alphas.length; i++) { 
+                that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(that.alphas[i] * 100) / 100); 
+                deleteHex(that);
+            };
+            //that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
+            //deleteHex(that);
+            that.context.restore();
+        }
+
         if(!fillStyle){
             that.context.strokeStyle = "rgb(" + that.r +", " + that.g +","+ that.b +")";
         }
         else{
             that.context.strokeStyle = fillStyle;
         }
-        that.context.translate(that.hexCenter.x, that.hexCenter.y);
-
-        if(typeof(that.prevAlpha) !== "undefined" && that.prevAlpha !== null){
-            that.context.save();
-            that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(that.prevAlpha * 100) / 100); 
-            deleteHex(that);
-            that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
-            deleteHex(that);
-            that.context.restore();
-        }
         
         if(typeof(alpha) !== "undefined" && alpha !== null){
-           that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
-           that.prevAlpha = alpha;
+            //that.context.save();
+            that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
+            that.alphas.push(alpha);
+            //that.context.restore();
         }
 
         drawHex(this);
-        that.context.stroke();
         that.context.restore();
     };
     function drawHex(that){
@@ -67,6 +72,7 @@ var Hex = (function () {
         that.context.lineTo(that.cosRadius,  -that.height);
         that.context.moveTo(0, 0);
         that.context.lineTo(that.cosRadius, that.height);
+        that.context.stroke();
     };
     function deleteHex(that){
         that.context.globalCompositeOperation = "destination-out";
@@ -78,8 +84,8 @@ var Hex = (function () {
         that.context.lineTo(that.cosRadius, that.height);
         that.context.lineTo(-that.radius + that.cosRadius, that.height);
         that.context.lineTo(-that.radius, 0);
-        that.context.fill();
         that.context.closePath();
+        that.context.fill();
     };
     Hex.prototype.isPointInPath = function(pos){
         var q2x = Math.abs(pos.x - this.hexCenter.x);
@@ -103,36 +109,35 @@ var Hex = (function () {
         
         return s > 0 && t > 0 && (s + t) < 2 * A * sign;
     }
-    Hex.prototype.mouseOver = function(callback, mousePos){
+    Hex.prototype.mouseMove = function(mousePos){
         this.mousePos = mousePos;
         if(typeof(this.animId) === "undefined" || this.animId === null){
-            this.callback = callback;
             var ctx = this.context;
             var draw = this.draw;
             var self = this;
-            this.animId = this.animator.animate(1000, 9,
-                function(alpha, progress, duration){
+            this.animId = this.animator.animate(1500, 9,
+                function(alpha, progress, duration, startTime, timeStamp){
+                    var frameTime = duration / 60;
+                    var currentFrame = Math.floor((timeStamp - startTime)/ frameTime);
+                    if(self.currentFrame && currentFrame <= self.currentFrame)
+                        return true;
+                    self.currentFrame = currentFrame;
                     var value = alpha + 0.4 * (1- alpha);
                     var fillStyle = "rgb(" + Math.round(self.r * value) +", " + Math.round(self.g* value) +","+ Math.round(self.b* value) +")";
                     self.draw(self, fillStyle, progress, alpha);
-                    //if(self.stopAnimation){
-                        if(self.r * value === self.r){
-                            self.animator.cancelAnimation(self.animId);
-                            self.animId = null;
-                            self.stopAnimation = false;
-                            self.rotationCount++;
-                        }
-                   // }
+                    if(self.r * value === self.r){
+                        self.animId = null;
+                        self.rotationCount++;
+                        self.alphas = [];
+                        self.currentFrame = null;
+                    }
                     return true;
                 }
-                , true, false
+                , false, false
             );
         }
     }
-    Hex.prototype.mouseExit = function(callback){
-       if(typeof(this.animId) !== "undefined" && this.animId !== null){
-            this.stopAnimation = true;
-       }
+    Hex.prototype.mouseExit = function(){
     }
     return Hex;
 }());

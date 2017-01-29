@@ -28,21 +28,24 @@ var Board = (function(){
                 hex.draw();
             }
         }
-    }
-    Board.prototype.mouseOver = function(mousePos, callback){
+    };
+    Board.prototype.mouseMove = function(mousePos){
         var hex;
         for (var x = 0; x < this.columns; x++) {
             for (var y = 0; y < this.rows; y++) {
                 if(this.hexagons[x][y].isPointInPath(mousePos) && this.hexagons[x][y] !== this.hexActive){
                     this.hexActive = this.hexagons[x][y];
-                    this.hexActive.mouseOver(callback, mousePos);
+                    this.hexActive.mouseMove(mousePos);
                 }
-                else{
-                    this.hexagons[x][y].mouseExit(callback);
-                }
+                // else{
+                //      this.hexagons[x][y].mouseExit();
+                // }
             }
         }           
-    }
+    };
+    Board.prototype.mouseOut = function(evt){
+        this.hexActive = null;
+    };
     Board.prototype.getHexAtPoint = function(pos){
         for (var x = 0; x < this.columns; x++) {
             for (var y = 0; y < this.rows; y++) {
@@ -52,6 +55,6 @@ var Board = (function(){
             }
         }           
         return null;
-    }
+    };
     return Board;
 }());
