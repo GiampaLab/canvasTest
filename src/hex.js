@@ -12,13 +12,11 @@ var Hex = (function () {
         // establish grid position
         this.pos = new Vector(x, y);
         // establish pixel position
-        this.pixelPos = new Vector(this.radius * 3 * x + y%2 * (this.radius + this.cosRadius), this.height * y);
         this.hexCenter = new Vector(this.radius + 3 * this.radius * x + y%2 * (this.radius + this.cosRadius), this.height + y * this.height);
         this.r = 35;
         this.g = 125;
         this.b = 112;
         this.animator = animator;
-        this.state = "ready";
         this.rotationCount = 0;
         this.alphas = [];
     };
@@ -31,14 +29,10 @@ var Hex = (function () {
         that.context.save();
         that.context.translate(that.hexCenter.x, that.hexCenter.y);
 
-        if(typeof(that.alphas) !== "undefined" && that.alphas !== null && that.alphas.length > 0){
+        if(typeof(that.alpha) !== "undefined" && that.alpha !== null){
             that.context.save();
-            for (i=0; i<that.alphas.length; i++) { 
-                that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(that.alphas[i] * 100) / 100); 
-                deleteHex(that);
-            };
-            //that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
-            //deleteHex(that);
+            that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(that.alpha * 100) / 100);
+            deleteHex(that);
             that.context.restore();
         }
 
@@ -52,7 +46,7 @@ var Hex = (function () {
         if(typeof(alpha) !== "undefined" && alpha !== null){
             //that.context.save();
             that.context.rotate(Math.PI/3 * this.rotationCount + Math.PI/3 * Math.round(alpha * 100) / 100);
-            that.alphas.push(alpha);
+            that.alpha = alpha;
             //that.context.restore();
         }
 
@@ -75,15 +69,18 @@ var Hex = (function () {
         that.context.stroke();
     };
     function deleteHex(that){
+        var deleteRadius = that.radius + 1;
+        var deletHeight = Math.round(Math.sqrt(3) * deleteRadius)/2;
+        var deleteCosRadius = Math.round(Math.cos(that.angle) * deleteRadius);
         that.context.globalCompositeOperation = "destination-out";
         that.context.beginPath();
-        that.context.moveTo(-that.radius, 0);
-        that.context.lineTo(-that.radius + that.cosRadius, -that.height);
-        that.context.lineTo(that.cosRadius,  -that.height);
-        that.context.lineTo(2 * that.cosRadius, 0);
-        that.context.lineTo(that.cosRadius, that.height);
-        that.context.lineTo(-that.radius + that.cosRadius, that.height);
-        that.context.lineTo(-that.radius, 0);
+        that.context.moveTo(-deleteRadius, 0);
+        that.context.lineTo(-deleteRadius + deleteCosRadius, -deletHeight);
+        that.context.lineTo(deleteCosRadius,  -deletHeight);
+        that.context.lineTo(2 * deleteCosRadius, 0);
+        that.context.lineTo(deleteCosRadius, deletHeight);
+        that.context.lineTo(-deleteRadius + deleteCosRadius, deletHeight);
+        that.context.lineTo(-deleteRadius, 0);
         that.context.closePath();
         that.context.fill();
     };
@@ -115,10 +112,10 @@ var Hex = (function () {
             var ctx = this.context;
             var draw = this.draw;
             var self = this;
-            this.animId = this.animator.animate(1500, 9,
+            this.animId = this.animator.animate(700, 9,
                 function(alpha, progress, duration, startTime, timeStamp){
-                    var frameTime = duration / 60;
-                    var currentFrame = Math.floor((timeStamp - startTime)/ frameTime);
+                    var frameTime = 1 / 60;
+                    var currentFrame = Math.floor((timeStamp - startTime)/ (1000 * frameTime));
                     if(self.currentFrame && currentFrame <= self.currentFrame)
                         return true;
                     self.currentFrame = currentFrame;
