@@ -109,6 +109,7 @@ var Hex = (function() {
     }
     Hex.prototype.mouseMove = function(mousePos) {
         this.mousePos = mousePos;
+        //dummy
         if (typeof(this.animId) === "undefined" || this.animId === null) {
             var ctx = this.context;
             var draw = this.draw;
