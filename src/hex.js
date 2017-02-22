@@ -16,6 +16,7 @@ var Hex = (function() {
         this.r = 35;
         this.g = 125;
         this.b = 112;
+        //rgb(219,235,232)
         this.animator = animator;
         this.rotationCount = 0;
     }
@@ -109,12 +110,11 @@ var Hex = (function() {
     }
     Hex.prototype.mouseMove = function(mousePos) {
         this.mousePos = mousePos;
-        //dummy
         if (typeof(this.animId) === "undefined" || this.animId === null) {
             var ctx = this.context;
             var draw = this.draw;
             var self = this;
-            this.animId = this.animator.animate(700, 10,
+            this.animId = this.animator.animate(700, 9,
                 function(alpha, progress, duration, startTime, timeStamp) {
                     var frameTime = 1 / 60;
                     var currentFrame = Math.floor((timeStamp - startTime) / (1000 * frameTime));
@@ -124,16 +124,16 @@ var Hex = (function() {
                     //var alpha2 = alpha + 0.4 * (1 - alpha);
                     var value = 1 - Math.abs(Math.sin(Math.PI * alpha));
                     // console.log(value);
-                    var fillStyle = "rgb(" + Math.round(self.r) + ", " + Math.round(self.g * value) + "," + Math.round(self.b) + ")";
+                    var fillStyle = "rgb(" + Math.round(self.r + (184 * (1 - value))) + ", " + Math.round(self.g + (110 * (1 - value))) + "," + Math.round(self.b + (120 * (1 - value))) + ")";
                     self.draw(self, fillStyle, progress, alpha);
                     if (alpha === 1) {
-                        self.animId = null;
                         self.rotationCount++;
                         self.currentFrame = null;
+                        self.animId = null;
                     }
                     return true;
-                }, false, false
-            );
+                },
+                false, false);
         }
     };
     Hex.prototype.mouseExit = function() {};
