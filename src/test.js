@@ -48,7 +48,7 @@ function start() {
     setCanvasWidthAndHeight(boardCanvas);
     ctx = canvas.getContext('2d');
     boardCtx = boardCanvas.getContext('2d');
-    board = new Board(boardCtx, canvas.clientWidth, canvas.clientHeight, 4, animator);
+    board = new Board(boardCtx, canvas.clientWidth, canvas.clientHeight, 15, animator);
     board.draw();
     playerCurrentCard = new Card(board, images.slice(8, 16));
     extractedCard = new Card(board, images.slice(0, 8));

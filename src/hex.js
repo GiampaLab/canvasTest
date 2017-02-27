@@ -70,7 +70,7 @@ var Hex = (function() {
     }
 
     function deleteHex(that) {
-        var deleteRadius = that.radius + 1;
+        var deleteRadius = that.radius + 2;
         var deletHeight = Math.round(Math.sqrt(3) * deleteRadius) / 2;
         var deleteCosRadius = Math.round(Math.cos(that.angle) * deleteRadius);
         that.context.globalCompositeOperation = "destination-out";
